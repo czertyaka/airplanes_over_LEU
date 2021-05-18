@@ -30,6 +30,7 @@ bool get_route(const QString& callsign, t_route& route)
     auto routeIt = routesMap.find(callsign);
     if (routeIt != routesMap.end())
     {
+        qInfo() << "Callsign" << callsign << "were found in QMap";
         route = *routeIt;
         return true;
     }
@@ -48,7 +49,13 @@ bool get_route(const QString& callsign, t_route& route)
         route.airports.push_back(i);
     }
 
-    return calculate_route_length(route);
+    if (!calculate_route_length(route))
+    {
+        return false;
+    }
+
+    routesMap.insert(callsign, route);
+    return true;
 }
 
 /**

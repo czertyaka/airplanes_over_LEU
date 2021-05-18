@@ -21,6 +21,7 @@ bool get_airplane(const QString& icao24, t_airplane& airplane)
     auto airplaneIt = airplanesMap.find(icao24);
     if (airplaneIt != airplanesMap.end())
     {
+        qInfo() << "icao24" << icao24 << "were found in QMap";
         airplane = *airplaneIt;
         return true;
     }
