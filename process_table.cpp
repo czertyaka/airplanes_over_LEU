@@ -34,15 +34,12 @@ bool process_table(const QString& table)
         QString length = routeOk ? QString::number(route.length) : "";
 
         QSqlQuery insertQuery;
-        insertQuery.prepare(QString("INSERT INTO %1 (manufacturer, type, origin, "
-                                    "destination, route_length) VALUES"
-                                    "(:manufacturer, :type, :origin, :destination,"
-                                    " :route_length);").arg(table));
-        insertQuery.bindValue(":manufacturer", manufacturer);
-        insertQuery.bindValue(":type", type);
-        insertQuery.bindValue(":origin", origin);
-        insertQuery.bindValue(":destination", destination);
-        insertQuery.bindValue(":route_length", length);
+        QString insertStr = QString("UPDATE %1 SET manufacturer='%2', type='%3', origin='%4', "
+                                    "destination='%5', route_length='%6' WHERE "
+                                    "icao24='%7' AND callsign='%8'").arg(table).
+                                    arg(manufacturer).arg(type).arg(origin).arg(destination).
+                                    arg(length).arg(icao24).arg(callsign);
+        insertQuery.prepare(insertStr);
         if (!insertQuery.exec())
         {
             qInfo() << "Error adding" << icao24 << callsign << "to database"
