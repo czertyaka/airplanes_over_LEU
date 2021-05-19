@@ -15,6 +15,14 @@ bool process_table(const QString& table)
         qInfo() << "Error reading from" << table << "table:" << getQuery.lastError().text();
     }
 
+    QSqlQuery clearColumns;
+    if (!clearColumns.exec(QString("UPDATE %1 SET manufacturer=NULL, type=NULL, origin=NULL, "
+                                    "destination=NULL, route_length=NULL;").arg(table)))
+    {
+        qInfo() << "Error cleaning columns" << clearColumns.lastError().text();
+        return -1;
+    }
+
     // reading database
     while (getQuery.next())
     {
@@ -30,16 +38,16 @@ bool process_table(const QString& table)
         t_route route;
         bool routeOk = get_route(callsign, route);
 
-        QString manufacturer = airplaneOk ? airplane.manufacturer : "";
-        QString type = airplaneOk ? airplane.type : "";
-        QString origin = routeOk ? route.airports.first() : "";
-        QString destination = routeOk ? route.airports.last() : "";
-        QString length = routeOk ? QString::number(route.length) : "";
+        QString manufacturer = airplaneOk ? "'" + airplane.manufacturer + "'" : "NULL";
+        QString type = airplaneOk ? "'" + airplane.type + "'" : "NULL";
+        QString origin = routeOk ? "'" + route.airports.first() + "'" : "NULL";
+        QString destination = routeOk ? "'" + route.airports.last() + "'" : "NULL";
+        QString length = routeOk ? "'" + QString::number(route.length) + "'" : "NULL";
 
         QSqlQuery insertQuery;
-        QString insertStr = QString("UPDATE %1 SET manufacturer='%2', type='%3', origin='%4', "
-                                    "destination='%5', route_length='%6' WHERE "
-                                    "date='%7' AND time='%8'").arg(table).
+        QString insertStr = QString("UPDATE %1 SET manufacturer=%2, type=%3, origin=%4, "
+                                    "destination=%5, route_length=%6 WHERE "
+                                    "date='%7' AND time='%8';").arg(table).
                                     arg(manufacturer).arg(type).arg(origin).arg(destination).
                                     arg(length).arg(date).arg(time);
         insertQuery.prepare(insertStr);
