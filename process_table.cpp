@@ -18,6 +18,9 @@ bool process_table(const QString& table)
     // reading database
     while (getQuery.next())
     {
+        const QString date = getQuery.value("date").toString();
+        const QString time = getQuery.value("time").toString();
+
         const QString icao24 = getQuery.value("icao24").toString();
         const QString callsign = getQuery.value("callsign").toString();
 
@@ -36,9 +39,9 @@ bool process_table(const QString& table)
         QSqlQuery insertQuery;
         QString insertStr = QString("UPDATE %1 SET manufacturer='%2', type='%3', origin='%4', "
                                     "destination='%5', route_length='%6' WHERE "
-                                    "icao24='%7' AND callsign='%8'").arg(table).
+                                    "date='%7' AND time='%8'").arg(table).
                                     arg(manufacturer).arg(type).arg(origin).arg(destination).
-                                    arg(length).arg(icao24).arg(callsign);
+                                    arg(length).arg(date).arg(time);
         insertQuery.prepare(insertStr);
         if (!insertQuery.exec())
         {
